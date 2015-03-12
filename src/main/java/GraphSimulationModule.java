@@ -6,12 +6,17 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 
 import javax.inject.Singleton;
+import java.util.Random;
 
 @Module(injects = GraphSimulator.class)
 public class GraphSimulationModule {
 
-    @Provides SimulatorStrategy provideStrategy(GraphDatabaseWrapper graphDb) {
-       return new ErdosRenyiStrategy(graphDb);
+    @Provides SimulatorStrategy provideStrategy(GraphDatabaseWrapper graphDb, Random random) {
+       return new ErdosRenyiStrategy(graphDb, random);
+    }
+
+    @Provides Random random() {
+        return new Random();
     }
 
     @Provides @Singleton GraphDatabaseService provideGraphDatabaseService() {

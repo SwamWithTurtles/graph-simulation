@@ -7,6 +7,7 @@ import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.kernel.impl.util.FileUtils;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -32,11 +33,11 @@ public class GraphDatabaseWrapper {
         }
     }
 
-    public void createNodeWithId(Integer id) {
+    public Node createNodeWithId(Integer id) {
         Map<String, String> idProperty = new HashMap<>();
         idProperty.put(ID_PROPERTY, id.toString());
 
-        createNode(LabelType.ENTITY, idProperty);
+        return createNode(LabelType.ENTITY, idProperty);
     }
 
     public void connectNodes(Integer id1, Integer id2) {
@@ -53,7 +54,7 @@ public class GraphDatabaseWrapper {
     private Node getSingleNodeWithId(Integer id) {
         ResourceIterable<Node> potentialNodes = graphDb.get().findNodesByLabelAndProperty(LabelType.ENTITY.getLabel(), ID_PROPERTY, id.toString());
         List<Node> nodes = IteratorUtil.asList(potentialNodes);
-        
+
         if(nodes.isEmpty()) {
             throw new NonExistentNodeIdException();
         } else if(nodes.size() > 1) {
@@ -64,13 +65,27 @@ public class GraphDatabaseWrapper {
     }
 
 
-    private void createNode(LabelType labelType, Map<String, String> nodeProperties) {
+    private Node createNode(LabelType labelType, Map<String, String> nodeProperties) {
+        Node node;
         try(Transaction tx = graphDb.get().beginTx()) {
-            Node node = graphDb.get().createNode(labelType.getLabel());
+            node = graphDb.get().createNode(labelType.getLabel());
             nodeProperties.forEach(node::setProperty);
 
             tx.success();
         }
+        return node;
     }
 
+    public int numberOfNodes() {
+        Integer size;
+        try(Transaction tx = graphDb.get().beginTx()) {
+            size = IteratorUtil.asList(
+                    GlobalGraphOperations.at(graphDb.get())
+                            .getAllNodesWithLabel(LabelType.ENTITY.getLabel())
+            ).size();
+
+            tx.success();
+        }
+        return size;
+    }
 }

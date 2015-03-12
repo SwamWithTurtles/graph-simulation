@@ -13,6 +13,9 @@ public class GraphSimulator {
 
     public void simulate() {
         strategy.setInitialConfig();
+        strategy.step();
+        strategy.step();
+        strategy.step();
     }
 
 }
