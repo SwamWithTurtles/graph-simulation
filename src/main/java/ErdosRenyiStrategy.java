@@ -20,5 +20,7 @@ public class ErdosRenyiStrategy implements SimulatorStrategy {
     public void setInitialConfig() {
         graphDb.reset();
         graphDb.createNodeWithId(1);
+        graphDb.createNodeWithId(2);
+        graphDb.connectNodes(1, 2);
     }
 }
