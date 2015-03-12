@@ -1,5 +1,6 @@
 import dagger.Module;
 import dagger.Provides;
+import dataAccess.GraphDatabaseWrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
@@ -9,8 +10,8 @@ import javax.inject.Singleton;
 @Module(injects = GraphSimulator.class)
 public class GraphSimulationModule {
 
-    @Provides SimulatorStrategy provideStrategy() {
-       return new ErdosRenyiStrategy();
+    @Provides SimulatorStrategy provideStrategy(GraphDatabaseWrapper graphDb) {
+       return new ErdosRenyiStrategy(graphDb);
     }
 
     @Provides @Singleton GraphDatabaseService provideGraphDatabaseService() {
